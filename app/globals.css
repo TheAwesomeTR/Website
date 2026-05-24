@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 42 52% 96%;
+  --foreground: 222 48% 16%;
+  --card: 41 52% 98%;
+  --card-foreground: 222 48% 16%;
+  --primary: 221 51% 16%;
+  --primary-foreground: 43 57% 96%;
+  --secondary: 39 42% 85%;
+  --secondary-foreground: 222 48% 16%;
+  --muted: 38 34% 90%;
+  --muted-foreground: 224 14% 42%;
+  --accent: 340 35% 65%;
+  --accent-foreground: 222 48% 16%;
+  --border: 37 33% 82%;
+  --input: 37 33% 82%;
+  --ring: 38 44% 54%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(251, 247, 239, 0.98), rgba(246, 238, 226, 0.94)),
+    repeating-linear-gradient(90deg, rgba(20, 33, 61, 0.025) 0 1px, transparent 1px 88px);
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans, Inter), ui-sans-serif, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+main,
+section,
+article,
+div,
+form {
+  min-width: 0;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(168, 128, 66, 0.24);
+}
+
+.font-editorial {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+}
+
+.sacred-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.sacred-frame::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(215, 189, 131, 0.32);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.number-field {
+  background-image:
+    linear-gradient(rgba(251, 247, 239, 0.74), rgba(251, 247, 239, 0.74)),
+    url("/images/number-veil.png");
+  background-position: center;
+  background-size: cover;
+}
+
+@media (max-width: 480px) {
+  .sacred-frame::before {
+    inset: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
