@@ -20,3 +20,5 @@ tsconfig.tsbuildinfo
 .tmpchrome
 .responsive-chrome-profile
 .dev.vars
+.codex/
+.wrangler/cache/
