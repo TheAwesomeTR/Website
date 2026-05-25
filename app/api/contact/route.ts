@@ -63,6 +63,9 @@ function getMailEnv(): MailEnv {
   try {
     return getCloudflareContext().env as MailEnv;
   } catch {
-    return process.env;
+    return {
+      RESEND_API_KEY: process.env.RESEND_API_KEY,
+      RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL
+    };
   }
 }
