@@ -19,7 +19,7 @@ export async function sendMail({
   html,
   text,
   replyTo,
-  env = process.env
+  env = {}
 }: SendMailInput) {
   const apiKey = env.RESEND_API_KEY;
 
