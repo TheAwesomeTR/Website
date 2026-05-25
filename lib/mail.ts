@@ -1,17 +1,26 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-
 type SendMailInput = {
   subject: string;
   html: string;
   text: string;
   replyTo?: string;
+  env?: MailEnv;
+};
+
+export type MailEnv = {
+  RESEND_API_KEY?: string;
+  RESEND_FROM_EMAIL?: string;
 };
 
 const mailRecipient = "egitim@gonulilhan.com";
 const defaultSender = "Gonul Ilhan <egitim@gonulilhan.com>";
 
-export async function sendMail({ subject, html, text, replyTo }: SendMailInput) {
-  const env = getRuntimeEnv();
+export async function sendMail({
+  subject,
+  html,
+  text,
+  replyTo,
+  env = process.env
+}: SendMailInput) {
   const apiKey = env.RESEND_API_KEY;
 
   if (!apiKey) {
@@ -40,17 +49,6 @@ export async function sendMail({ subject, html, text, replyTo }: SendMailInput) 
   }
 
   return response.json() as Promise<{ id: string }>;
-}
-
-function getRuntimeEnv() {
-  try {
-    return {
-      ...process.env,
-      ...getCloudflareContext().env
-    };
-  } catch {
-    return process.env;
-  }
 }
 
 export function escapeHtml(value: string) {

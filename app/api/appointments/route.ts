@@ -1,5 +1,6 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextResponse } from "next/server";
-import { renderRows, renderText, sendMail } from "@/lib/mail";
+import { renderRows, renderText, sendMail, type MailEnv } from "@/lib/mail";
 import type { AppointmentPayload } from "@/lib/booking";
 
 export async function POST(request: Request) {
@@ -27,6 +28,7 @@ export async function POST(request: Request) {
     await sendMail({
       subject: `Randevu talebi: ${payload.service}`,
       replyTo: payload.email,
+      env: getMailEnv(),
       html: `
         <h1 style="font-size:20px;">Yeni randevu talebi</h1>
         <table style="border-collapse:collapse;">${renderRows(rows)}</table>
@@ -60,4 +62,12 @@ function validateAppointmentPayload(payload: Partial<AppointmentPayload>) {
 
 function isEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function getMailEnv(): MailEnv {
+  try {
+    return getCloudflareContext().env as MailEnv;
+  } catch {
+    return process.env;
+  }
 }
