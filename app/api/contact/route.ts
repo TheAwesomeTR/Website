@@ -1,6 +1,12 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextResponse } from "next/server";
-import { renderRows, renderText, sendMail, type MailEnv } from "@/lib/mail";
+import {
+  renderRows,
+  renderText,
+  resolveMailEnv,
+  sendMail,
+  type MailEnv
+} from "@/lib/mail";
 import type { ContactPayload } from "@/lib/contact";
 
 export async function POST(request: Request) {
@@ -12,19 +18,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: validationError }, { status: 400 });
     }
 
+    const contact = normalizeContactPayload(payload);
     const reference = `MSG-${Date.now()}`;
     const rows: Array<[string, string]> = [
       ["Referans", reference],
-      ["Ad Soyad", payload.name],
-      ["E-posta", payload.email],
-      ["Telefon", payload.phone],
-      ["Konu", payload.topic],
-      ["Mesaj", payload.message]
+      ["Ad Soyad", contact.name],
+      ["E-posta", contact.email],
+      ["Telefon", contact.phone],
+      ["Konu", contact.topic],
+      ["Mesaj", contact.message]
     ];
 
     await sendMail({
-      subject: `Iletisim formu: ${payload.topic}`,
-      replyTo: payload.email,
+      subject: `Iletisim formu: ${contact.topic}`,
+      replyTo: contact.email,
       env: getMailEnv(),
       html: `
         <h1 style="font-size:20px;">Yeni iletisim formu mesaji</h1>
@@ -59,13 +66,21 @@ function isEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function normalizeContactPayload(payload: ContactPayload): ContactPayload {
+  return {
+    ...payload,
+    name: payload.name.trim(),
+    email: payload.email.trim(),
+    phone: payload.phone.trim(),
+    topic: payload.topic.trim(),
+    message: payload.message.trim()
+  };
+}
+
 function getMailEnv(): MailEnv {
   try {
-    return getCloudflareContext().env as MailEnv;
+    return resolveMailEnv(getCloudflareContext().env as MailEnv);
   } catch {
-    return {
-      RESEND_API_KEY: process.env.RESEND_API_KEY,
-      RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL
-    };
+    return resolveMailEnv();
   }
 }

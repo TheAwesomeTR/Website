@@ -19,13 +19,23 @@ export async function sendMail({
   html,
   text,
   replyTo,
-  env = {}
+  env
 }: SendMailInput) {
-  const apiKey = env.RESEND_API_KEY;
+  const runtimeEnv = resolveMailEnv(env);
+  const apiKey = runtimeEnv.RESEND_API_KEY?.trim();
 
   if (!apiKey) {
     throw new Error("RESEND_API_KEY is not configured.");
   }
+
+  const body = {
+    from: runtimeEnv.RESEND_FROM_EMAIL?.trim() || defaultSender,
+    to: [mailRecipient],
+    subject,
+    html,
+    text,
+    ...(replyTo?.trim() ? { reply_to: replyTo.trim() } : {})
+  };
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -33,14 +43,7 @@ export async function sendMail({
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      from: env.RESEND_FROM_EMAIL ?? defaultSender,
-      to: [mailRecipient],
-      reply_to: replyTo,
-      subject,
-      html,
-      text
-    })
+    body: JSON.stringify(body)
   });
 
   if (!response.ok) {
@@ -49,6 +52,13 @@ export async function sendMail({
   }
 
   return response.json() as Promise<{ id: string }>;
+}
+
+export function resolveMailEnv(env?: MailEnv): MailEnv {
+  return {
+    RESEND_API_KEY: env?.RESEND_API_KEY ?? process.env.RESEND_API_KEY,
+    RESEND_FROM_EMAIL: env?.RESEND_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL
+  };
 }
 
 export function escapeHtml(value: string) {

@@ -1,6 +1,12 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextResponse } from "next/server";
-import { renderRows, renderText, sendMail, type MailEnv } from "@/lib/mail";
+import {
+  renderRows,
+  renderText,
+  resolveMailEnv,
+  sendMail,
+  type MailEnv
+} from "@/lib/mail";
 import type { AppointmentPayload } from "@/lib/booking";
 
 export async function POST(request: Request) {
@@ -12,22 +18,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: validationError }, { status: 400 });
     }
 
+    const appointment = normalizeAppointmentPayload(payload);
     const reference = `GI-${Date.now()}`;
     const rows: Array<[string, string]> = [
       ["Referans", reference],
-      ["Hizmet / Egitim", payload.service],
-      ["Ad Soyad", payload.name],
-      ["E-posta", payload.email],
-      ["Telefon", payload.phone],
-      ["Tercih edilen tarih", payload.preferredDate],
-      ["Tercih edilen saat", payload.preferredTime],
-      ["Gorusme tercihi", payload.meetingPreference],
-      ["Mesaj", payload.message]
+      ["Hizmet / Egitim", appointment.service],
+      ["Ad Soyad", appointment.name],
+      ["E-posta", appointment.email],
+      ["Telefon", appointment.phone],
+      ["Tercih edilen tarih", appointment.preferredDate],
+      ["Tercih edilen saat", appointment.preferredTime],
+      ["Gorusme tercihi", appointment.meetingPreference],
+      ["Mesaj", appointment.message]
     ];
 
     await sendMail({
-      subject: `Randevu talebi: ${payload.service}`,
-      replyTo: payload.email,
+      subject: `Randevu talebi: ${appointment.service}`,
+      replyTo: appointment.email,
       env: getMailEnv(),
       html: `
         <h1 style="font-size:20px;">Yeni randevu talebi</h1>
@@ -64,13 +71,24 @@ function isEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function normalizeAppointmentPayload(payload: AppointmentPayload): AppointmentPayload {
+  return {
+    ...payload,
+    service: payload.service.trim(),
+    name: payload.name.trim(),
+    email: payload.email.trim(),
+    phone: payload.phone.trim(),
+    preferredDate: payload.preferredDate.trim(),
+    preferredTime: payload.preferredTime.trim(),
+    meetingPreference: payload.meetingPreference.trim(),
+    message: payload.message.trim()
+  };
+}
+
 function getMailEnv(): MailEnv {
   try {
-    return getCloudflareContext().env as MailEnv;
+    return resolveMailEnv(getCloudflareContext().env as MailEnv);
   } catch {
-    return {
-      RESEND_API_KEY: process.env.RESEND_API_KEY,
-      RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL
-    };
+    return resolveMailEnv();
   }
 }
