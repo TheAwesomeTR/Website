@@ -18,7 +18,7 @@ const sections = [
   },
   {
     title: "Saklama ve güvenlik",
-    text: "Kişisel veriler, işlenme amacı için gerekli süre boyunca ve makul güvenlik önlemleriyle saklanmalıdır. Bu proje aşamasında formlar demo olarak çalışır ve gerçek veritabanına kayıt yapmaz."
+    text: "Kişisel veriler, işlenme amacı için gerekli süre boyunca ve makul güvenlik önlemleriyle saklanmalıdır. Formlar üzerinden iletilen bilgiler e-posta yoluyla ilgili ekibe ulaştırılır."
   },
   {
     title: "Hakların",

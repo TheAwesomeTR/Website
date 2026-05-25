@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  futureBookingIntegrations,
   submitAppointmentRequest,
   type AppointmentPayload
 } from "@/lib/booking";
@@ -77,8 +76,7 @@ export function AppointmentForm() {
         </h2>
         <p className="mt-3 leading-7 text-muted-foreground">
           Gönül İlhan ekibi en kısa sürede uygunluk ve görüşme detayları için
-          seninle iletişime geçecek. Bu form şu an demo olarak çalışır ve
-          gerçek ödeme ya da takvim kaydı oluşturmaz.
+          seninle iletişime geçecek.
         </p>
         <Button className="mt-6" onClick={() => setStatus("idle")}>
           Yeni Talep Oluştur
@@ -229,16 +227,6 @@ export function AppointmentForm() {
           {error}
         </p>
       ) : null}
-
-      <div className="mt-6 rounded-2xl border border-gold/25 bg-gold-sheen p-3 sm:p-4">
-        <p className="text-sm font-semibold text-navy">
-          Gelecekte bağlanmaya hazır yapı
-        </p>
-        <p className="mt-2 text-xs leading-6 text-muted-foreground">
-          {futureBookingIntegrations.join(" · ")} entegrasyonları için form
-          verisi ayrıştırılmış ve mock handler üzerinden çalışır.
-        </p>
-      </div>
     </form>
   );
 }

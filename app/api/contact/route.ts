@@ -11,7 +11,7 @@ import type { ContactPayload } from "@/lib/contact";
 
 export async function POST(request: Request) {
   try {
-    const payload = (await request.json()) as ContactPayload;
+    const payload = await readContactPayload(request);
     const validationError = validateContactPayload(payload);
 
     if (validationError) {
@@ -52,6 +52,42 @@ export async function POST(request: Request) {
   }
 }
 
+async function readContactPayload(request: Request): Promise<ContactPayload> {
+  const payload = await readJson(request);
+
+  if (!isRecord(payload)) {
+    return emptyContactPayload();
+  }
+
+  return {
+    name: stringValue(payload.name),
+    email: stringValue(payload.email),
+    phone: stringValue(payload.phone),
+    topic: stringValue(payload.topic),
+    message: stringValue(payload.message),
+    consent: payload.consent === true
+  };
+}
+
+async function readJson(request: Request) {
+  try {
+    return await request.json();
+  } catch {
+    return null;
+  }
+}
+
+function emptyContactPayload(): ContactPayload {
+  return {
+    name: "",
+    email: "",
+    phone: "",
+    topic: "",
+    message: "",
+    consent: false
+  };
+}
+
 function validateContactPayload(payload: Partial<ContactPayload>) {
   if (!payload.name?.trim()) return "Ad soyad zorunludur.";
   if (!payload.email?.trim()) return "E-posta zorunludur.";
@@ -64,6 +100,14 @@ function validateContactPayload(payload: Partial<ContactPayload>) {
 
 function isEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function stringValue(value: unknown) {
+  return typeof value === "string" ? value : "";
 }
 
 function normalizeContactPayload(payload: ContactPayload): ContactPayload {

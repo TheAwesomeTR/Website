@@ -11,7 +11,7 @@ import type { AppointmentPayload } from "@/lib/booking";
 
 export async function POST(request: Request) {
   try {
-    const payload = (await request.json()) as AppointmentPayload;
+    const payload = await readAppointmentPayload(request);
     const validationError = validateAppointmentPayload(payload);
 
     if (validationError) {
@@ -55,6 +55,48 @@ export async function POST(request: Request) {
   }
 }
 
+async function readAppointmentPayload(request: Request): Promise<AppointmentPayload> {
+  const payload = await readJson(request);
+
+  if (!isRecord(payload)) {
+    return emptyAppointmentPayload();
+  }
+
+  return {
+    service: stringValue(payload.service),
+    name: stringValue(payload.name),
+    email: stringValue(payload.email),
+    phone: stringValue(payload.phone),
+    preferredDate: stringValue(payload.preferredDate),
+    preferredTime: stringValue(payload.preferredTime),
+    meetingPreference: stringValue(payload.meetingPreference),
+    message: stringValue(payload.message),
+    consent: payload.consent === true
+  };
+}
+
+async function readJson(request: Request) {
+  try {
+    return await request.json();
+  } catch {
+    return null;
+  }
+}
+
+function emptyAppointmentPayload(): AppointmentPayload {
+  return {
+    service: "",
+    name: "",
+    email: "",
+    phone: "",
+    preferredDate: "",
+    preferredTime: "",
+    meetingPreference: "",
+    message: "",
+    consent: false
+  };
+}
+
 function validateAppointmentPayload(payload: Partial<AppointmentPayload>) {
   if (!payload.service?.trim()) return "Hizmet veya egitim secimi zorunludur.";
   if (!payload.name?.trim()) return "Ad soyad zorunludur.";
@@ -69,6 +111,14 @@ function validateAppointmentPayload(payload: Partial<AppointmentPayload>) {
 
 function isEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function stringValue(value: unknown) {
+  return typeof value === "string" ? value : "";
 }
 
 function normalizeAppointmentPayload(payload: AppointmentPayload): AppointmentPayload {
