@@ -19,3 +19,4 @@ tsconfig.tsbuildinfo
 .shot-test*
 .tmpchrome
 .responsive-chrome-profile
+.dev.vars
