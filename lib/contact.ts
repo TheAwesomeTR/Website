@@ -8,11 +8,26 @@ export type ContactPayload = {
 };
 
 export async function submitContactMessage(payload: ContactPayload) {
-  await new Promise((resolve) => setTimeout(resolve, 650));
+  const response = await fetch("/api/contact", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const result = (await response.json()) as {
+    ok: boolean;
+    reference?: string;
+    error?: string;
+  };
+
+  if (!response.ok || !result.ok) {
+    throw new Error(result.error ?? "Mesaj gonderilemedi.");
+  }
 
   return {
-    ok: true,
-    reference: `MSG-${Date.now()}`,
-    payload
+    ok: result.ok,
+    reference: result.reference
   };
 }

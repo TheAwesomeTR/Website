@@ -19,6 +19,7 @@ export function ContactForm() {
     consent: false
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [error, setError] = useState("");
 
   function updateField<T extends keyof ContactPayload>(
     field: T,
@@ -32,8 +33,19 @@ export function ContactForm() {
     if (!payload.consent) return;
 
     setStatus("loading");
-    await submitContactMessage(payload);
-    setStatus("success");
+    setError("");
+
+    try {
+      await submitContactMessage(payload);
+      setStatus("success");
+    } catch (submissionError) {
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "Mesaj gonderilemedi."
+      );
+      setStatus("idle");
+    }
   }
 
   if (status === "success") {
@@ -148,6 +160,11 @@ export function ContactForm() {
       >
         {status === "loading" ? "Gönderiliyor..." : "Mesaj Gönder"}
       </Button>
+      {error ? (
+        <p className="mt-3 text-sm font-medium text-red-700" role="alert">
+          {error}
+        </p>
+      ) : null}
     </form>
   );
 }

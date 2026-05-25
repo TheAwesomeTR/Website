@@ -39,6 +39,7 @@ export function AppointmentForm() {
     consent: false
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [error, setError] = useState("");
 
   function updateField<T extends keyof AppointmentPayload>(
     field: T,
@@ -52,8 +53,19 @@ export function AppointmentForm() {
     if (!payload.consent) return;
 
     setStatus("loading");
-    await submitAppointmentRequest(payload);
-    setStatus("success");
+    setError("");
+
+    try {
+      await submitAppointmentRequest(payload);
+      setStatus("success");
+    } catch (submissionError) {
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "Randevu talebi gonderilemedi."
+      );
+      setStatus("idle");
+    }
   }
 
   if (status === "success") {
@@ -212,6 +224,11 @@ export function AppointmentForm() {
       >
         {status === "loading" ? "Gönderiliyor..." : "Randevu Talebi Gönder"}
       </Button>
+      {error ? (
+        <p className="mt-3 text-sm font-medium text-red-700" role="alert">
+          {error}
+        </p>
+      ) : null}
 
       <div className="mt-6 rounded-2xl border border-gold/25 bg-gold-sheen p-3 sm:p-4">
         <p className="text-sm font-semibold text-navy">

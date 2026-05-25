@@ -11,12 +11,27 @@ export type AppointmentPayload = {
 };
 
 export async function submitAppointmentRequest(payload: AppointmentPayload) {
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  const response = await fetch("/api/appointments", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const result = (await response.json()) as {
+    ok: boolean;
+    reference?: string;
+    error?: string;
+  };
+
+  if (!response.ok || !result.ok) {
+    throw new Error(result.error ?? "Randevu talebi gonderilemedi.");
+  }
 
   return {
-    ok: true,
-    reference: `GI-${Date.now()}`,
-    payload
+    ok: result.ok,
+    reference: result.reference
   };
 }
 
