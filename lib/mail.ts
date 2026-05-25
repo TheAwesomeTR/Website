@@ -1,3 +1,5 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+
 type SendMailInput = {
   subject: string;
   html: string;
@@ -9,7 +11,8 @@ const mailRecipient = "egitim@gonulilhan.com";
 const defaultSender = "Gonul Ilhan <egitim@gonulilhan.com>";
 
 export async function sendMail({ subject, html, text, replyTo }: SendMailInput) {
-  const apiKey = process.env.RESEND_API_KEY;
+  const env = getRuntimeEnv();
+  const apiKey = env.RESEND_API_KEY;
 
   if (!apiKey) {
     throw new Error("RESEND_API_KEY is not configured.");
@@ -22,7 +25,7 @@ export async function sendMail({ subject, html, text, replyTo }: SendMailInput) 
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      from: process.env.RESEND_FROM_EMAIL ?? defaultSender,
+      from: env.RESEND_FROM_EMAIL ?? defaultSender,
       to: [mailRecipient],
       reply_to: replyTo,
       subject,
@@ -37,6 +40,17 @@ export async function sendMail({ subject, html, text, replyTo }: SendMailInput) 
   }
 
   return response.json() as Promise<{ id: string }>;
+}
+
+function getRuntimeEnv() {
+  try {
+    return {
+      ...process.env,
+      ...getCloudflareContext().env
+    };
+  } catch {
+    return process.env;
+  }
 }
 
 export function escapeHtml(value: string) {
