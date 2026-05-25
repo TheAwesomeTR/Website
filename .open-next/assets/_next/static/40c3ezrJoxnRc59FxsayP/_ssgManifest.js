@@ -1,1 +1,0 @@
-self.__SSG_MANIFEST=new Set(["\u002Fegitimler\u002F[slug]","\u002Fyazilar\u002F[slug]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
