@@ -13,10 +13,10 @@ import {
 export const siteConfig = {
   name: "Gönül İlhan",
   title: "Numeroloji Uzmanı",
-  email: "merhaba@gonulilhan.com",
-  phone: "+90 5XX XXX XX XX",
-  whatsapp: "+90 5XX XXX XX XX",
-  instagram: "@gonulilhan",
+  email: "egitim@gonulilhan.com",
+  phone: "+90 533 048 64 56",
+  whatsapp: "+90 533 048 64 56",
+  instagram: "@gonulilhan7",
   location: "İstanbul / Online görüşme",
   workingHours: "Hafta içi 10.00 - 18.00",
   description:
