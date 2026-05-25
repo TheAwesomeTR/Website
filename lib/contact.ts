@@ -8,11 +8,20 @@ export type ContactPayload = {
 };
 
 export async function submitContactMessage(payload: ContactPayload) {
-  await new Promise((resolve) => setTimeout(resolve, 650));
+  const response = await fetch("/api/forms", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      type: "contact",
+      payload
+    })
+  });
 
-  return {
-    ok: true,
-    reference: `MSG-${Date.now()}`,
-    payload
-  };
+  if (!response.ok) {
+    throw new Error("Contact form could not be sent.");
+  }
+
+  return response.json() as Promise<{ ok: true; reference: string }>;
 }

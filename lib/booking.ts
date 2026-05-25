@@ -11,13 +11,22 @@ export type AppointmentPayload = {
 };
 
 export async function submitAppointmentRequest(payload: AppointmentPayload) {
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  const response = await fetch("/api/forms", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      type: "appointment",
+      payload
+    })
+  });
 
-  return {
-    ok: true,
-    reference: `GI-${Date.now()}`,
-    payload
-  };
+  if (!response.ok) {
+    throw new Error("Appointment form could not be sent.");
+  }
+
+  return response.json() as Promise<{ ok: true; reference: string }>;
 }
 
 export const futureBookingIntegrations = [

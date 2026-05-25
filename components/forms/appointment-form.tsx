@@ -38,7 +38,9 @@ export function AppointmentForm() {
     message: "",
     consent: false
   });
-  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
+    "idle"
+  );
 
   function updateField<T extends keyof AppointmentPayload>(
     field: T,
@@ -52,8 +54,12 @@ export function AppointmentForm() {
     if (!payload.consent) return;
 
     setStatus("loading");
-    await submitAppointmentRequest(payload);
-    setStatus("success");
+    try {
+      await submitAppointmentRequest(payload);
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
   }
 
   if (status === "success") {
@@ -65,8 +71,7 @@ export function AppointmentForm() {
         </h2>
         <p className="mt-3 leading-7 text-muted-foreground">
           Gönül İlhan ekibi en kısa sürede uygunluk ve görüşme detayları için
-          seninle iletişime geçecek. Bu form şu an demo olarak çalışır ve
-          gerçek ödeme ya da takvim kaydı oluşturmaz.
+          seninle iletişime geçecek.
         </p>
         <Button className="mt-6" onClick={() => setStatus("idle")}>
           Yeni Talep Oluştur
@@ -213,13 +218,19 @@ export function AppointmentForm() {
         {status === "loading" ? "Gönderiliyor..." : "Randevu Talebi Gönder"}
       </Button>
 
+      {status === "error" ? (
+        <p className="mt-3 rounded-2xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+          Form gönderilemedi. Lütfen bilgilerini kontrol edip tekrar dene.
+        </p>
+      ) : null}
+
       <div className="mt-6 rounded-2xl border border-gold/25 bg-gold-sheen p-3 sm:p-4">
         <p className="text-sm font-semibold text-navy">
           Gelecekte bağlanmaya hazır yapı
         </p>
         <p className="mt-2 text-xs leading-6 text-muted-foreground">
           {futureBookingIntegrations.join(" · ")} entegrasyonları için form
-          verisi ayrıştırılmış ve mock handler üzerinden çalışır.
+          verisi ayrıştırılmış ve e-posta yönlendirmesiyle çalışır.
         </p>
       </div>
     </form>
