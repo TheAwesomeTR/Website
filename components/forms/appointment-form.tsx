@@ -35,9 +35,11 @@ export function AppointmentForm() {
     preferredTime: timeSlots[1],
     meetingPreference: "Online",
     message: "",
-    consent: false
+    consent: false,
+    website: ""
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const minDate = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const [error, setError] = useState("");
 
   function updateField<T extends keyof AppointmentPayload>(
@@ -104,6 +106,15 @@ export function AppointmentForm() {
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
+        <input
+          type="text"
+          value={payload.website ?? ""}
+          onChange={(event) => updateField("website", event.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          className="hidden"
+          aria-hidden="true"
+        />
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="service">Hizmet / Eğitim seçimi</Label>
           <select
@@ -157,6 +168,7 @@ export function AppointmentForm() {
             value={payload.preferredDate}
             onChange={(event) => updateField("preferredDate", event.target.value)}
             required
+            min={minDate}
           />
         </Field>
 

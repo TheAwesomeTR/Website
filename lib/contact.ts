@@ -5,6 +5,7 @@ export type ContactPayload = {
   topic: string;
   message: string;
   consent: boolean;
+  website?: string;
 };
 
 export async function submitContactMessage(payload: ContactPayload) {
