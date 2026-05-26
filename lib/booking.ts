@@ -8,6 +8,7 @@ export type AppointmentPayload = {
   meetingPreference: string;
   message: string;
   consent: boolean;
+  website?: string;
 };
 
 export async function submitAppointmentRequest(payload: AppointmentPayload) {

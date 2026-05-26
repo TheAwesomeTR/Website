@@ -16,7 +16,8 @@ export function ContactForm() {
     phone: "",
     topic: "Genel bilgi",
     message: "",
-    consent: false
+    consent: false,
+    website: ""
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [error, setError] = useState("");
@@ -83,6 +84,15 @@ export function ContactForm() {
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
+        <input
+          type="text"
+          value={payload.website ?? ""}
+          onChange={(event) => updateField("website", event.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          className="hidden"
+          aria-hidden="true"
+        />
         <Field label="Ad Soyad" id="contactName">
           <Input
             id="contactName"
